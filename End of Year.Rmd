@@ -1,0 +1,98 @@
+---
+title: "Advance Crime Statistics Final Assessment"
+author: "Luckson"
+date: "12/13/2019"
+output:
+  pdf_document: default
+---
+
+
+1.INTRODUCTION
+This paper is based on crime statistical analysis looking at Department of Corrections facilities for both man and women for at least 4 years with excel data that 5 variables which are the facilities.
+
+2.RESEARCH QUESTIONS
+Crime related Question from Incarceration data
+Having male incarcerated in Central Detention Facility give rise to their female counterparts detention??
+
+2.i.HYPOTHESIS-
+Central Detention Facility_Males numbers has no significant effect to the number of people in Correctional Treatment Facility_Males
+
+3.RESEARCH METHODOLOGY
+The study shall use R with R-Markdown for analysing different crime hypothesises to come out with Department of Corrections facilities relational variables given the numbers of people that are checked in on a daily basis.Also to be used is Linear and multiple regression to get correlations,mean and levels of significance on different variables.An hp laptop with a 64bit capacity is to be used.
+
+```{r echo=FALSE}
+library(readxl)
+mydata <- read_excel("Incarceration_data.xlsx")
+## loading the file into a data frame
+incarceration <- mydata [,c("CDF_M","CTF_M","CDF_J","CTF_F","CDF_F")]
+incarceration
+```
+## KEY = Central Detention Facicility_Males(CDF_M)
+##Correctional Treatment Facility_M(CTF_M)
+##Central Detention Facility_J(CDF_J)
+##Correctional Treatment Facility_F(CTF_F)
+##Central Detention Facilitry_F(CDF_F)
+
+## Summary of the data frame (incarceration)
+```{r}
+summary (incarceration)
+
+corincarceration <- incarceration [,c("CDF_M","CTF_M","CDF_J","CDF_F","CTF_F")]
+corincarceration
+
+cor(corincarceration)
+
+## coefficient in a regression indicates that the variable in
+#question is linearly related to the other variables with contributions 
+#to change to the other variable.
+#the coefficients in multi-regression mean that variables 
+#make add value to any hypothesis
+
+linearMod <- lm(CDF_M ~ CDF_F, data=corincarceration)  
+print(linearMod)
+# linear regression model 
+
+
+summary (linearMod)
+
+##p-value: < 2.2e-16 shows is above the pre-determined 
+#significance level of 0.05
+##the CDF_F variable has more signficance in this linear
+#model,the more the NUMBER in CDF-M the increase in number of CDF_F
+
+library("ggpubr") ## using Pearson model
+ggscatter(corincarceration, x = "CDF_M", y = "CDF_F", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+
+corgraph <- cor.test(corincarceration$CDF_M, corincarceration$CDF_F) 
+                    method = ("pearson")
+corgraph
+
+##Is women incarceration in CDF_F affected by changes in 
+#other variables like (CDF_M,CTF_F,CDF_F) which is the 
+#question that I would like to ask ?? ## Multiple Regression
+
+
+MultiModel_1 <- lm(CDF_F ~ CDF_M+CTF_F+CDF_F+CDF_J, data=corincarceration)
+## This 1st model of multi-regression assumes that Y iS CDF_F AND X are all other variables
+print(MultiModel_1)
+##(Intercept)122.887742        CDF_M-0.007076        CTF_F 0.237580        CDF_J 1.340990  
+summary (MultiModel_1)
+##This 1st model shows the inability of 3 variables to have a significant effect on Y
+
+MultiModel_2 <- lm(CDF_F ~ CDF_M+CTF_F, data=corincarceration)
+## The 2nd hypothesis will only have 2 variables to find out their levels of significance to Y
+
+print(MultiModel_2)
+##This result shows the ability of these two variables having a stronger level of significance 
+##(Intercept)        CDF_M        CTF_F  
+##  128.24409      0.01032      0.24482  
+summary (MultiModel_2)
+##This hypothesis with two variables which answers our 1st question
+
+```
+
+Conclusion
+
+Incarceration data for people who would have commited various criminal acts with both male and females being held at two distingt Department of Corrections Facilities. So the data used showed that women numbers being held up are much less than that of their male counterparts.Central Detention Facility_Females was mainly a constant variable with other variables being predictors coming out with differnt results or outcomes. 
